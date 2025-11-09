@@ -10,7 +10,7 @@ import struct
 def dns_query(type, name, server):
     # Create a UDP socket
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    server_address = (server, ????) # Enter Port Number
+    server_address = (server, 53) # Enter Port Number
 
     # Create the DNS query
     ID = 0x1234
@@ -69,7 +69,10 @@ def dns_query(type, name, server):
         
         # Example: The QR field is located in the second byte of the DNS header, with its most significant bit being the leftmost bit of this byte. Since each byte contains 8 bits, shifting the value of the QR field left by 15 bits moves it to the correct position in the 16-bit value that represents the combination of several fields in the DNS header.
 
-    header = struct.pack('!HHHHHH', ID, QR << 15 | OPCODE << ?? | AA << ?? | TC << ?? | RD << ??| RA << ?? | Z << ?? | RCODE, QDCOUNT, ANCOUNT, NSCOUNT, ARCOUNT)
+    # 15 QR, 14 OPCODE, 10 AA, 9 TC, 8 RD, 7 RA, 4 Z, 0 
+
+    header = struct.pack('!HHHHHH', ID, QR << 15 | OPCODE << 14 | AA << 10 | TC << 9 | RD << 8 | RA << 7 | Z << 4 | RCODE, QDCOUNT, ANCOUNT, NSCOUNT, ARCOUNT)
+
 
     # Encode the QNAME
     
