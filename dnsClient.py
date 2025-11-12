@@ -85,7 +85,7 @@ def dns_query(type, name, server):
         
     qname_parts = name.split('.') # How can we easily split the string?
     qname_encoded_parts = [struct.pack('B', len(part)) + part.encode('utf-8') for part in qname_parts] # Make sure it's encoded as a sequence of the right character encoding type (lowercase)
-    qname_encoded = b''.join(qname_encoded_parts) + b'\x??' #enter the closing byte value to signify the end of the domain string (two digits)
+    qname_encoded = b''.join(qname_encoded_parts) + b'\x00' #enter the closing byte value to signify the end of the domain string (two digits)
 
     # Encode the QTYPE and QCLASS
 
@@ -145,20 +145,20 @@ def dns_query(type, name, server):
         name = '.'.join(name_parts)
 
         # Parse the type, class, TTL, and RDLENGTH
-        type, cls, ttl, rdlength = struct.unpack('!HHIH', response_answer[offset:offset+????]) # What is the offset value in bytes? Remember 'H' represent 2 bytes, and 'I' represents 4 bytes, we declared '!HHIH'. 
+        type, cls, ttl, rdlength = struct.unpack('!HHIH', response_answer[offset:offset+12]) # What is the offset value in bytes? Remember 'H' represent 2 bytes, and 'I' represents 4 bytes, we declared '!HHIH'. 
         
-        offset += ???? # Same value as just calculated
+        offset += 12 # Same value as just calculated
 
         # Parse the RDATA
         rdata = response_answer[offset:offset+rdlength]
         offset += rdlength
 
-        if type == ?????: # Lookup Type value
+        if type == "A": # Lookup Type value
             # A record (IPv4 address)
             ipv4 = socket.inet_ntop(socket.AF_INET, rdata)
-            print(f'{name} has IPv4 address {ipv4}')\
+            print(f'{name} has IPv4 address {ipv4}')
             return ipv4
-        elif type == ?????: # Lookup Type value
+        elif type == "AAAA": # Lookup Type value
             # AAAA record (IPv6 address)
             ipv6 = socket.inet_ntop(socket.AF_INET6, rdata)
             print(f'{name} has IPv6 address {ipv6}')
